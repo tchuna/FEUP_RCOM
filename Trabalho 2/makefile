@@ -1,0 +1,1 @@
+gcc -o download main.c -Wall

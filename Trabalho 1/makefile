@@ -1,0 +1,1 @@
+gcc -o programa main.c linkLayer.c appLayer.c utilities.c -Wall

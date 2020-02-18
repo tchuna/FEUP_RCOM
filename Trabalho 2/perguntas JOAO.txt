@@ -1,0 +1,113 @@
+Experiencia 2-Implementar duas lans virtuais num switch
+
+
+Como configurar vlany0?
+
+Primeiro é necessário que estejam criadas as ligações entre as portas do switch, o tux1 e o tux4. Depois cria-se a vlan com :
+1.configure terminal
+2.vlan y0
+3.end
+Em seguida devem ser adicionadas as portas do tux1 e tux4:
+1.configure terminal
+2.interface fastethernet 0/nPorta
+3.switchport mode access
+4.switchport access vlan y0
+5.end
+
+
+Quantos domínios de transmissão existem? O que se pode concluir a partir dos registos?
+
+Existem apenas dois domínios de transmissão, já que o tux 1 apenas consegue receber resposta do tux4 e o tux2 não consegue receber de nenhum.
+Um dos domínios contém o tux1 e o tux4 e o outro apenas o tux2.
+
+
+
+Experiência 4 - Configurar um router comercial e implementar o NAT
+
+
+Como configurar uma rota estática num router comercial?
+
+Para se configurar uma rota estática num router comercial é necessário:
+1.conf t
+2.ip route 0.0.0.0 0.0.0.0 172.16.1.254
+3.ip route 172.16.50.0 255.255.255.0 172.16.51.253
+4.end
+
+
+Quais são os caminhos seguidos pelos pacotes nas experiências efetuadas e porque?
+
+Caso a rota exista os pacotes utilizam-na, se não vão pela rota default para o router.
+No primeiro teste efetuado através de um ping do tux2 para o tux1 os pacotes foram enviados para o router primeiramente e depois encaminhados para a vlany0.
+Em seguida se for realizado o mesmo teste verifica-se que vai diretamente do tux2 para a vlany0 pois o router registou o redirecionamento para esse destino.
+
+
+Como configurar o NAT num router comercial?
+
+Para se configurar o NAT:
+1.conf t
+2.interface gigabitethernet 0/0
+3.ip address 172.16.y1.254 255.255.255.0
+4.no shutdown
+5.ip nat inside
+6.exit
+7.interface gigabitethernet 0/1
+8.ip address 172.16.1.y9 255.255.255.0
+9.no shutdown
+10.ip nat outside
+11.exit
+Em seguida cria-se uma lista de permissões de acesso aos pacotes para todas as vlans:
+1.ip natpool ovrld 172.16.1.y9 172.16.1.y9 prefix 24
+2.ip nat inside source list 1 pool ovrld overload
+3.access-list 1 permit 172.16.y0.0 0.0.0.255
+4.access-list 1 permit 172.16.y1.0 0.0.0.255
+Por fim adicionam-se as rotas:
+1.ip route 0.0.0.0 0.0.0.0 172.16.1.254
+2.ip route 172.16.y0.0 255.255.255.0 172.16.y1.253
+3.end
+
+
+O que faz o NAT?
+
+O Network Address Translation tem como objetivo a conservação dos endereços de IP e trata de toda a ligação da rede local à internet.
+Em adição o NAT também oferece segurança pois um grupo de computadores é representado apenas por um único IP.
+
+
+
+Experiência 6 - Ligação TCP
+
+
+Quantas ligações TCP são abertas pela aplicação ftp?
+
+São abertas 2 ligações TCP, a de controlo e a de dados.
+
+
+Em qual ligação é transportada a informação de controlo ftp?
+
+A informação de controlo ftp é transportada pela ligação de controlo.
+
+
+Quais são as fases de uma ligação TCP?
+
+Uma ligação TCP é composta por 3 fases
+1-Estabelecimento de conexão
+2-Troca de data
+3-Encerramento de conexão
+
+
+Como funciona o mecanismo ARQ TCP? Quais os campos relevantes TCP? Que informação relevante pode ser observada nos logs?
+
+O ARQ(Automatic Repeat Request) TCP utiliza o mecanismo Sliding Window que consiste no controlo de erros na transmissão
+dos dados. Utilizando os acknowledgment numbers das mensagens enviadas pelo recetor verifica se a trama está correta
+, o window size que indica de que gama podem ser os pacotes enviados pelo emissor e o sequence number que contém o número do pacote a ser enviado.
+
+
+Como funciona o mecanismo de controlo de congestão TCP? Quais são os campos relevantes? Como evolui o fluxo de dados?
+Funciona de acordo com o mecanismo de controlo de congestão TCP?
+
+Para o TCP mantém uma estimativa do número de octetos que a rede consegue encaminhar utiliza o mecanismo de controlo de congestão, impedindo assim
+que tente enviar mais octetos do que o da janela definida pelo recetor.
+(NESTA PeRGunta FALTA ALGUMA CENA DE AVALIAÇÃO DAS LOGS OU ASSIM)
+
+A ligação de data TCP é afetada pelo aparecimento de outra ligação TCP? Como?
+
+Sim pois quando é criada uma segunda ligação TCP leva a uma queda na taxa de transmissão, já que esta é dividida por cada uma.
